@@ -6,6 +6,8 @@
    ===================================================================== */
 
 const STORE = 'proofy-v1';
+/* embed=1 — сайт показан внутри макета ноутбука/телефона на главной: без шапки, интро и записи данных */
+const EMBED = new URLSearchParams(location.search).has('embed');
 
 const LEVELS = {
   school:   { label: 'Школьный',        base: 20 },
@@ -118,7 +120,7 @@ function load() {
   try { const raw = localStorage.getItem(STORE); if (raw) return JSON.parse(raw); } catch (e) { /* приватный режим */ }
   return seed();
 }
-function save() { try { localStorage.setItem(STORE, JSON.stringify(db)); } catch (e) { /* ignore */ } }
+function save() { if (EMBED) return; try { localStorage.setItem(STORE, JSON.stringify(db)); } catch (e) { /* ignore */ } }
 
 /* ---------------- Хелперы ---------------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -353,14 +355,26 @@ function viewHome() {
         <a class="btn ghost lg" href="#/buyer">Найти таланты ${I.arrow}</a>
       </div>
     </div>
-    <div class="hero-visual reveal">
-      <div class="orbit o1"><i></i></div><div class="orbit o2"><i></i></div>
+    <div class="hero-visual devices reveal">
+      <div class="orbit o1"><i></i></div>
+      ${EMBED ? certVisual(db.certs[0], { scan: true }) : `
+      <div class="laptop"><div class="lt-screen"><div class="live" data-live="#/verify?id=PRF-GH26-0001" data-w="1280"></div></div><div class="lt-base"></div></div>
+      <div class="phone mini"><div class="notch"></div><div class="screen"><div class="live" data-live="#/t/s1" data-w="390"></div></div></div>`}
       <div class="float-tag t1"><span class="badge ok">${I.check}</span><span>Проверено за <b>0,2 с</b></span></div>
       <div class="float-tag t2"><span class="badge gold">вес</span><b>77</b><span>/ 100</span></div>
-      <div class="float-tag t3"><span class="badge sky">${I.map}</span><span>Хромтау → вуз</span></div>
-      ${certVisual(db.certs[0], { scan: true })}
     </div>
   </section>
+
+  ${EMBED ? '' : `<section class="wrap section" id="inside">
+    <div class="section-head reveal"><div class="eyebrow">Загляни внутрь</div><h2>Это настоящий продукт — нажимайте</h2></div>
+    <div class="inside reveal">
+      <div class="inside-menu">
+        ${[['#/verify?id=PRF-OM26-0003&claim=winner', 'Проверка', I.shield], ['#/org/k/k1', 'Организатор', I.building], ['#/student', 'Школьник', I.user], ['#/buyer', 'Вузы', I.search], ['#/ranking', 'Рейтинг', I.spark]]
+          .map(([h, t, ic], i) => `<button class="${i === 0 ? 'on' : ''}" data-act="inside" data-v="${h}">${ic}<span>${t}</span></button>`).join('')}
+      </div>
+      <div class="laptop big"><div class="lt-screen"><div class="live interactive" id="insideLive" data-live="#/verify?id=PRF-OM26-0003&claim=winner" data-w="1280"></div></div><div class="lt-base"></div></div>
+    </div>
+  </section>`}
 
   <button class="scroll-cue" data-act="scrollCue"><span class="mouse"></span>Листайте вниз</button>
 
@@ -469,12 +483,6 @@ function viewHome() {
   </section>
 
   <section class="wrap section">
-    <div class="section-head reveal"><div class="eyebrow">Выберите роль</div><h2>Попробуйте каждую сторону</h2></div>
-    <div class="grid g3">
-      <a class="role-card reveal" href="#/org"><div class="flow-ico">${I.building}</div><h3>Организатор</h3><p>Выдать сертификаты призёрам за минуту</p><span class="go">Открыть кабинет →</span></a>
-      <a class="role-card reveal" href="#/student"><div class="flow-ico">${I.user}</div><h3>Школьник</h3><p>Портфолио одной ссылкой и согласие</p><span class="go">Открыть кабинет →</span></a>
-      <a class="role-card reveal" href="#/buyer"><div class="flow-ico">${I.search}</div><h3>Вуз или агентство</h3><p>Проверенные таланты из регионов</p><span class="go">Открыть кабинет →</span></a>
-    </div>
     <div class="cta-band reveal"><h2>Проверьте настоящий и поддельный сертификат прямо сейчас</h2><a class="btn gold lg" href="#/verify">${I.qr}К проверке</a></div>
   </section></div>`;
 }
@@ -1327,7 +1335,30 @@ function observeReveal() {
   io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
   $$('.reveal').forEach((el) => io.observe(el));
 }
-function afterRender() { drawQRs(); animateWidgets(); }
+function afterRender() { drawQRs(); animateWidgets(); mountLive(); }
+
+/* Живые экраны: наш же сайт в режиме embed внутри макетов устройств */
+const liveRO = new ResizeObserver((es) => es.forEach((e) => fitLive(e.target)));
+function fitLive(box) {
+  const f = box.querySelector('iframe'); if (!f) return;
+  const w = +box.dataset.w, s = box.clientWidth / w;
+  f.style.transform = `scale(${s})`;
+  f.style.height = `${box.clientHeight / s}px`;
+}
+function mountLive() {
+  if (EMBED || document.body.classList.contains('intro-on')) return;
+  $$('.live').forEach((box) => {
+    if (box.querySelector('iframe')) return;
+    const f = document.createElement('iframe');
+    f.src = `${location.pathname}?embed=1${box.dataset.live}`;
+    f.title = 'Proofy';
+    f.loading = 'lazy';
+    f.style.width = `${box.dataset.w}px`;
+    if (!box.classList.contains('interactive')) f.tabIndex = -1;
+    box.appendChild(f);
+    liveRO.observe(box); fitLive(box);
+  });
+}
 
 function render() {
   const nav = currentNav();
@@ -1344,6 +1375,7 @@ function render() {
   if (!document.body.classList.contains('intro-on')) maybeAutoTour();
 }
 function maybeAutoTour() {
+  if (EMBED) return;
   const key = currentNav();
   let seen = false; try { seen = localStorage.getItem('proofy-tour-' + key) === '1'; } catch (e) { /* ignore */ }
   if (!seen && TOURS[key]) setTimeout(() => startTour(false), 700);
@@ -1436,7 +1468,16 @@ document.addEventListener('click', async (e) => {
     }
     case 'regDone': reg.step = 1; reg.role = null; reg.method = null; reg.age = null; break;
     case 'langToggle': { const m = $('#langMenu'); m.hidden = !m.hidden; break; }
-    case 'setLang': setLang(el.dataset.lang); $('#langMenu').hidden = true; break;
+    case 'setLang':
+      setLang(el.dataset.lang); $('#langMenu').hidden = true;
+      $$('.live iframe').forEach((f) => { try { f.contentWindow.setLang(el.dataset.lang); } catch (err) { /* ещё грузится */ } });
+      break;
+    case 'inside': {
+      $$('.inside-menu button').forEach((b) => b.classList.toggle('on', b === el));
+      const f = $('#insideLive iframe');
+      if (f) { try { f.contentWindow.location.hash = el.dataset.v; } catch (err) { f.src = `${location.pathname}?embed=1${el.dataset.v}`; } }
+      break;
+    }
     case 'toTop': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
     case 'scrollCue': { const s = $('.page .section'); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - 70, behavior: 'smooth' }); break; }
     case 'dot': { e.preventDefault(); const s = document.getElementById(el.dataset.target); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - 80, behavior: 'smooth' }); break; }
@@ -1536,6 +1577,7 @@ function onScroll() {
   $('#topbar').classList.toggle('scrolled', y > 10);
   $('#scrollBar').style.width = `${max > 0 ? Math.min(100, (y / max) * 100) : 0}%`;
   $('#toTop').hidden = y < 600;
+  const cta = $('#stickyCta'); if (cta) cta.classList.toggle('show', !EMBED && currentNav() === 'home' && y > 520);
 }
 window.addEventListener('scroll', onScroll, { passive: true });
 
@@ -1562,7 +1604,7 @@ function endIntro(fast) {
   clearTimeout(introTimer);
   el.classList.add('leaving');
   document.body.classList.remove('entered');
-  setTimeout(() => { document.body.classList.remove('intro-on'); document.body.classList.add('entered'); }, fast ? 150 : 300);
+  setTimeout(() => { document.body.classList.remove('intro-on'); document.body.classList.add('entered'); setTimeout(mountLive, 500); }, fast ? 150 : 300);
   setTimeout(() => { el.hidden = true; maybeAutoTour(); }, fast ? 800 : 1100);
 }
 function playIntro() {
@@ -1582,7 +1624,8 @@ function playIntro() {
   startI18n();
   await ensureCrypto();
   render(); syncTabs(); onScroll();
-  if (new URLSearchParams(location.search).has('nointro') || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    const el = $('#intro'); el.hidden = true; document.body.classList.remove('intro-on'); document.body.classList.add('entered'); maybeAutoTour();
+  if (EMBED) document.body.classList.add('embed');
+  if (EMBED || new URLSearchParams(location.search).has('nointro') || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const el = $('#intro'); el.hidden = true; document.body.classList.remove('intro-on'); document.body.classList.add('entered'); maybeAutoTour(); mountLive();
   } else introTimer = setTimeout(() => endIntro(false), 4300);
 })();

@@ -1,0 +1,68 @@
+/* ================= Стеклянная шапка из капсул ================= */
+.topbar { top: 12px; background: transparent !important; box-shadow: none !important; border-bottom: 0; backdrop-filter: none; pointer-events: none; }
+.topbar-in { height: 58px !important; gap: 10px; }
+.topbar-in > * { pointer-events: auto; }
+.glass, .topbar .logo, .topbar .nav, .topbar .top-actions {
+  background: rgba(13, 18, 32, .55); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, .12); box-shadow: 0 10px 30px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+.topbar .logo { height: 52px; padding: 0 18px 0 9px; border-radius: 999px; }
+.topbar .nav { height: 52px; padding: 6px; border-radius: 999px; margin-left: auto; align-items: center; }
+.topbar .nav a { border-radius: 999px; padding: 9px 14px; }
+.topbar .nav a.active { background: rgba(255, 255, 255, .1); color: var(--ink); }
+.topbar .nav a::after { display: none; }
+.topbar .top-actions { height: 52px; padding: 0 7px; border-radius: 999px; margin-left: 0; gap: 6px; }
+.topbar .api-pill { border: 0; }
+.topbar.scrolled .logo, .topbar.scrolled .nav, .topbar.scrolled .top-actions { background: rgba(13, 18, 32, .82); }
+.scroll-progress { position: fixed; top: 0; bottom: auto; left: 0; right: 0; height: 3px; z-index: 60; }
+main { padding-top: 84px; }
+@media (max-width: 900px) { .topbar .top-actions { margin-left: auto; } }
+
+/* ================= Макеты устройств с живыми экранами ================= */
+.live { position: absolute; inset: 0; overflow: hidden; background: var(--bg); }
+.live iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; pointer-events: none; background: var(--bg); }
+.live.interactive iframe { pointer-events: auto; }
+.laptop { position: relative; width: min(560px, 100%); }
+.lt-screen { position: relative; aspect-ratio: 16 / 10; border: 10px solid #1A2131; border-bottom-width: 14px; border-radius: 18px 18px 6px 6px; overflow: hidden; background: #000;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .08), 0 0 80px rgba(46, 197, 240, .12); }
+.lt-base { height: 14px; margin: 0 -7%; border-radius: 0 0 18px 18px; background: linear-gradient(180deg, #3A4258, #141A28); position: relative; }
+.lt-base::before { content: ""; position: absolute; left: 50%; top: 0; width: 18%; height: 5px; margin-left: -9%; border-radius: 0 0 8px 8px; background: #0E1320; }
+.devices { min-height: 440px; perspective: none; }
+.devices .laptop { transform: rotate(-1.5deg); z-index: 1; }
+.phone.mini { position: absolute; right: -2%; bottom: 0; width: 168px; height: 344px; border-radius: 32px; padding: 8px; transform: rotate(5deg); z-index: 2; }
+.phone.mini .notch { top: 12px; width: 56px; height: 16px; }
+.phone.mini .screen { border-radius: 25px; }
+.devices .float-tag.t1 { top: 2%; left: -4%; z-index: 3; }
+.devices .float-tag.t2 { bottom: 4%; left: 4%; right: auto; z-index: 3; }
+@media (max-width: 900px) { .phone.mini { width: 130px; height: 266px; right: 0; } .devices { min-height: 340px; } }
+
+/* ================= Загляни внутрь ================= */
+.inside { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 22px; align-items: center; }
+.inside-menu { display: grid; gap: 8px; }
+.inside-menu button { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); font: 600 15px Inter; cursor: pointer; text-align: left; transition: .2s; position: relative; overflow: hidden; }
+.inside-menu button svg { width: 20px; height: 20px; flex: none; }
+.inside-menu button:hover { color: var(--ink); border-color: var(--line-2); }
+.inside-menu button.on { color: #04121A; background: linear-gradient(135deg, var(--sky), #7EDCF7); border-color: transparent; box-shadow: 0 10px 30px rgba(46, 197, 240, .3); }
+.laptop.big { width: 100%; }
+@media (max-width: 900px) {
+  .inside { grid-template-columns: 1fr; }
+  .inside-menu { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+  .inside-menu button { flex-direction: column; gap: 4px; padding: 10px 4px; font-size: 11px; text-align: center; }
+}
+
+/* ================= Плавающая кнопка внизу ================= */
+.sticky-cta { position: fixed; left: 50%; bottom: 22px; z-index: 43; display: flex; align-items: center; gap: 12px; padding: 16px 30px; border-radius: 999px;
+  font: 700 16px Inter; color: #04121A; background: linear-gradient(135deg, var(--sky), #8BE3FB); box-shadow: 0 16px 50px rgba(46, 197, 240, .45), inset 0 1px 0 rgba(255, 255, 255, .5);
+  transform: translate(-50%, 140%); opacity: 0; transition: transform .45s cubic-bezier(.2, 1.2, .3, 1), opacity .3s; overflow: hidden; }
+.sticky-cta svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.sticky-cta.show { transform: translate(-50%, 0); opacity: 1; }
+.sticky-cta:hover { text-decoration: none; box-shadow: 0 20px 60px rgba(46, 197, 240, .6); }
+.sticky-cta:active { transform: translate(-50%, 0) scale(.96); }
+@media (max-width: 900px) { .sticky-cta { display: none; } }
+
+/* ================= Режим embed (внутри макета) ================= */
+body.embed .topbar, body.embed .footer, body.embed .tabbar, body.embed .to-top, body.embed .dots, body.embed .sticky-cta, body.embed .scroll-cue, body.embed .scroll-progress { display: none !important; }
+body.embed main { padding-top: 8px; }
+body.embed { padding-bottom: 0 !important; scrollbar-width: none; }
+body.embed::-webkit-scrollbar { display: none; }
+body.embed::after { display: none; }

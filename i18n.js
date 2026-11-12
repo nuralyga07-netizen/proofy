@@ -137,6 +137,8 @@ const DICT_ROWS = [
   ['Шымкент', 'Шымкент', 'Shymkent', 'Şımkent', '奇姆肯特'],
   ['Кызылорда', 'Қызылорда', 'Kyzylorda', 'Kızılorda', '克孜勒奥尔达'],
   ['Тараз', 'Тараз', 'Taraz', 'Taraz', '塔拉兹'],
+  ['Загляни внутрь', 'Ішіне қара', 'Look inside', 'İçine göz at', '看看里面'],
+  ['Это настоящий продукт — нажимайте', 'Бұл нағыз өнім — басып көріңіз', 'It’s a real product — click around', 'Bu gerçek bir ürün — tıklayın', '这是真实产品，点点看'],
   ['Хромтау → вуз', 'Хромтау → ЖОО', 'Khromtau → university', 'Hromtau → üniversite', '赫罗姆套 → 高校'],
   // Приватность и роли
   ['Данные несовершеннолетних', 'Кәмелетке толмағандардың деректері', 'Data of minors', 'Reşit olmayanların verileri', '未成年人数据'],
