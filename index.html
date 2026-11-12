@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Proofy — реестр подтверждённых достижений</title>
+  <meta name="description" content="Организатор выдаёт сертификат с QR, вуз или агентство проверяет его за 5 секунд и видит вес конкурса.">
+  <meta name="theme-color" content="#070A12">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="intro-on">
+  <!-- Интро: 4.5 секунды -->
+  <div id="intro" class="intro" aria-hidden="true">
+    <div class="intro-grid"></div>
+    <div class="intro-glow"></div>
+    <div class="intro-stage">
+      <div class="intro-logo">
+        <div class="intro-mark">P</div>
+        <div class="intro-word"><span>P</span><span>R</span><span>O</span><span>O</span><span>F</span><span>Y</span></div>
+      </div>
+      <div class="intro-cert">
+        <div class="ic-top"><i></i><i></i></div>
+        <div class="ic-title">СЕРТИФИКАТ</div>
+        <div class="ic-line w70"></div>
+        <div class="ic-line w50"></div>
+        <div class="ic-line w60"></div>
+        <div class="ic-qr"></div>
+        <div class="ic-scan"></div>
+        <div class="ic-stamp">ПОДЛИННЫЙ<b>✓</b></div>
+      </div>
+      <div class="intro-tag">Талант виден. <em>Подделка — нет.</em></div>
+    </div>
+    <button class="intro-skip" data-act="skipIntro">Пропустить</button>
+  </div>
+
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a href="#/" class="logo"><span class="logo-mark">P</span><span>Proofy</span></a>
+      <nav class="nav" id="nav">
+        <a href="#/verify" data-nav="verify">Проверка</a>
+        <a href="#/ranking" data-nav="ranking">Рейтинг конкурсов</a>
+        <a href="#/org" data-nav="org">Организаторам</a>
+        <a href="#/student" data-nav="student">Школьникам</a>
+        <a href="#/buyer" data-nav="buyer">Вузам и агентствам</a>
+        <a href="#/api" data-nav="api">API</a>
+      </nav>
+      <div class="top-actions">
+        <a href="#/api" class="api-pill" id="apiPill" title="Состояние API"><i></i><span id="apiMs">API · онлайн</span></a>
+        <button class="icon-btn" data-act="tour" title="Мини-инструкция">?</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="app"></main>
+
+  <footer class="footer">
+    <div class="wrap footer-in">
+      <div><span class="logo small"><span class="logo-mark">P</span>Proofy</span>
+        <p class="muted small">Прототип для Gambit Hackathon 2026 · трек HackHub «Талант до вуза». Все имена и данные тестовые.</p></div>
+      <div class="row">
+        <button class="btn ghost sm" data-act="replayIntro">Показать интро</button>
+        <button class="btn ghost sm" data-act="reset">Сбросить демо-данные</button>
+      </div>
+    </div>
+  </footer>
+
+  <div id="modal" class="modal" hidden></div>
+  <div id="tour" class="tour" hidden></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
