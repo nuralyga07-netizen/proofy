@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Proofy — реестр подтверждённых достижений</title>
   <meta name="description" content="Организатор выдаёт сертификат с QR, вуз или агентство проверяет его за 5 секунд и видит вес конкурса.">
   <meta name="theme-color" content="#070A12">
@@ -11,12 +11,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="sections.css">
+  <link rel="stylesheet" href="ux.css">
 </head>
 <body class="intro-on">
-  <!-- Интро: 4.5 секунды -->
+  <!-- Интро -->
   <div id="intro" class="intro" aria-hidden="true">
     <div class="intro-grid"></div>
     <div class="intro-glow"></div>
+    <div class="intro-beams"><i></i><i></i><i></i></div>
     <div class="intro-stage">
       <div class="intro-logo">
         <div class="intro-mark">P</div>
@@ -32,27 +34,33 @@
         <div class="ic-scan"></div>
         <div class="ic-stamp">ПОДЛИННЫЙ<b>✓</b></div>
       </div>
-      <div class="intro-tag">Талант виден. <em>Подделка — нет.</em></div>
+      <div class="intro-tag"><span>Талант виден.</span> <em>Подделка — нет.</em></div>
     </div>
+    <div class="intro-progress"><i></i></div>
     <button class="intro-skip" data-act="skipIntro">Пропустить</button>
   </div>
 
-  <header class="topbar">
+  <header class="topbar" id="topbar">
     <div class="wrap topbar-in">
       <a href="#/" class="logo"><span class="logo-mark">P</span><span>Proofy</span></a>
       <nav class="nav" id="nav">
         <a href="#/verify" data-nav="verify">Проверка</a>
-        <a href="#/ranking" data-nav="ranking">Рейтинг конкурсов</a>
+        <a href="#/ranking" data-nav="ranking">Рейтинг</a>
         <a href="#/org" data-nav="org">Организаторам</a>
         <a href="#/student" data-nav="student">Школьникам</a>
-        <a href="#/buyer" data-nav="buyer">Вузам и агентствам</a>
+        <a href="#/buyer" data-nav="buyer">Вузам</a>
         <a href="#/api" data-nav="api">API</a>
       </nav>
       <div class="top-actions">
         <a href="#/api" class="api-pill" id="apiPill" title="Состояние API"><i></i><span id="apiMs">API · онлайн</span></a>
+        <div class="lang" id="langBox">
+          <button class="lang-btn" data-act="langToggle" title="Язык" aria-haspopup="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg><b data-lang-current>RU</b></button>
+          <div class="lang-menu" id="langMenu" hidden></div>
+        </div>
         <button class="icon-btn" data-act="tour" title="Мини-инструкция">?</button>
       </div>
     </div>
+    <div class="scroll-progress"><i id="scrollBar"></i></div>
   </header>
 
   <main id="app"></main>
@@ -69,12 +77,25 @@
     </div>
   </footer>
 
+  <!-- Нижнее меню на телефоне -->
+  <nav class="tabbar" id="tabbar">
+    <a href="#/" data-nav="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Главная</span></a>
+    <a href="#/verify" data-nav="verify"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>Проверка</span></a>
+    <a href="#/ranking" data-nav="ranking"><svg viewBox="0 0 24 24"><path d="M6 20V10M12 20V4M18 20v-7"/></svg><span>Рейтинг</span></a>
+    <a href="#/student" data-nav="student"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Школьник</span></a>
+    <a href="#/buyer" data-nav="buyer"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg><span>Вузы</span></a>
+  </nav>
+
+  <button class="to-top" id="toTop" data-act="toTop" title="Наверх" hidden><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+  <nav class="dots" id="dots" hidden></nav>
+
   <div id="modal" class="modal" hidden></div>
   <div id="tour" class="tour" hidden></div>
   <div id="toast" class="toast" hidden></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <script src="i18n.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

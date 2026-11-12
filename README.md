@@ -71,3 +71,8 @@ Gambit Hackathon 2026 · трек HackHub · кейс «Талант до вуз
 | [jsQR 1.4.0](https://github.com/cozmo/jsQR) (jsDelivr) | Распознавание QR с камеры | Apache-2.0 |
 | [Inter](https://fonts.google.com/specimen/Inter), [Unbounded](https://fonts.google.com/specimen/Unbounded), [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) (Google Fonts) | Шрифты | OFL |
 | Claude Code (Anthropic) | Помощь с кодом интерфейса и структурой решения | — |
+
+## Языки и бэкенд
+
+- Интерфейс на 5 языках: қазақша, русский, English, Türkçe, 中文 (кнопка с глобусом в шапке, файл `i18n.js`).
+- Задание для бэкенда: [BACKEND.md](BACKEND.md) — таблицы, эндпоинты, формат подписи ECDSA и правила доступа.

@@ -350,10 +350,7 @@ function viewHome() {
     </div>
   </section>
 
-  <div class="ticker"><div class="wrap ticker-in">
-    <div class="ticker-label"><i></i>Реестр · демо</div>
-    <div class="ticker-feed" id="ticker"></div>
-  </div></div>
+  <button class="scroll-cue" data-act="scrollCue"><span class="mouse"></span>Листайте вниз</button>
 
   <section class="wrap section">
     <div class="grid g4">
@@ -1054,7 +1051,8 @@ function renderApiLog() {
 /* ===================== Мини-инструкция (тур) ===================== */
 const TOURS = {
   home: [
-    { sel: '#nav', t: 'Пять разделов', d: 'Проверка, три роли и API. Начните с проверки.', m: '#mnav' },
+    { sel: '#nav', t: 'Разделы всегда под рукой', d: 'Меню остаётся наверху при прокрутке. На телефоне — панель внизу.', m: '#tabbar' },
+    { sel: '#langBox', t: 'Язык и навигация', d: 'Пять языков. Справа — точки для быстрого перехода по разделам страницы.' },
     { sel: '#heroCta', t: 'Проверка за 5 секунд', d: 'Введите ID или отсканируйте QR. Есть демо: настоящий, подделка, изменённый результат.' },
     { sel: '#weightLab', t: 'Вес грамоты', d: 'Двигайте ползунки и сравните областную олимпиаду с платной «международной».' },
     { sel: '#apiPill', t: 'Живой API', d: 'Каждое действие — запрос к серверу. Задержка видна здесь, журнал — в разделе API.' },
@@ -1175,7 +1173,7 @@ function render() {
   $('#app').innerHTML = route();
   $$('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === (nav === 'contest' ? 'org' : nav)));
   afterRender(); observeReveal(); updateWeightPreview();
-  if (nav === 'home') startTicker(); else clearInterval(tickTimer);
+  buildDots(nav === 'home');
   if (nav === 'api') renderApiLog();
   const { parts, params } = parseRoute();
   if (parts[0] === 'verify' || parts[0] === 'c') {
@@ -1234,6 +1232,11 @@ document.addEventListener('click', async (e) => {
   const act = el.dataset.act;
   switch (act) {
     case 'skipIntro': endIntro(true); break;
+    case 'langToggle': { const m = $('#langMenu'); m.hidden = !m.hidden; break; }
+    case 'setLang': setLang(el.dataset.lang); $('#langMenu').hidden = true; break;
+    case 'toTop': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
+    case 'scrollCue': { const s = $('.page .section'); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - 70, behavior: 'smooth' }); break; }
+    case 'dot': { e.preventDefault(); const s = document.getElementById(el.dataset.target); if (s) window.scrollTo({ top: s.getBoundingClientRect().top + scrollY - 80, behavior: 'smooth' }); break; }
     case 'replayIntro': playIntro(); break;
     case 'tour': startTour(true); break;
     case 'tourNext': if (++tourI >= tourSteps.length) endTour(); else showTourStep(); break;
@@ -1304,31 +1307,79 @@ document.addEventListener('mousemove', (e) => {
 window.addEventListener('resize', () => { if (!$('#tour').hidden) showTourStep(); });
 window.addEventListener('hashchange', () => { endTour(); closeModal(); render(); window.scrollTo(0, 0); });
 
+/* ===================== Точки разделов, прокрутка, отклик ===================== */
+let dotIO;
+function buildDots(on) {
+  const box = $('#dots');
+  if (dotIO) dotIO.disconnect();
+  if (!on) { box.hidden = true; box.innerHTML = ''; return; }
+  const secs = [['s-hero', 'Главная', $('.hero')]];
+  $$('.page section.section').forEach((s, i) => {
+    const eb = s.querySelector('.eyebrow');
+    if (!eb) return;
+    s.id = s.id || `s-${i}`;
+    secs.push([s.id, eb.textContent.trim(), s]);
+  });
+  if (secs[0][2]) secs[0][2].id = 's-hero';
+  box.innerHTML = secs.map(([id, label]) => `<a href="#" data-act="dot" data-target="${id}"><span>${esc(label)}</span></a>`).join('');
+  box.hidden = false;
+  dotIO = new IntersectionObserver((es) => es.forEach((en) => {
+    if (en.isIntersecting) $$('#dots a').forEach((a) => a.classList.toggle('on', a.dataset.target === en.target.id));
+  }), { rootMargin: '-45% 0px -50% 0px' });
+  secs.forEach(([, , el]) => el && dotIO.observe(el));
+}
+function onScroll() {
+  const y = window.scrollY, max = document.documentElement.scrollHeight - innerHeight;
+  $('#topbar').classList.toggle('scrolled', y > 10);
+  $('#scrollBar').style.width = `${max > 0 ? Math.min(100, (y / max) * 100) : 0}%`;
+  $('#toTop').hidden = y < 600;
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+
+/* Отклик на нажатие: волна от точки касания */
+document.addEventListener('pointerdown', (e) => {
+  const t = e.target.closest('.btn, .chip, .nav a, .tabbar a, .role-card, .icon-btn, .lang-btn, .to-top, .tabs a, .dots a, .lang-menu button, .switch');
+  if (!t || t.disabled) return;
+  const r = t.getBoundingClientRect(), d = Math.max(r.width, r.height);
+  const s = document.createElement('span');
+  s.className = 'rp';
+  s.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
+  t.appendChild(s);
+  t.classList.remove('pressed'); void t.offsetWidth; t.classList.add('pressed');
+  setTimeout(() => s.remove(), 650);
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#langBox')) { const m = $('#langMenu'); if (m) m.hidden = true; }
+});
+
 /* ===================== Интро ===================== */
 let introTimer;
 function endIntro(fast) {
-  const el = $('#intro'); if (!el || el.hidden) return;
+  const el = $('#intro'); if (!el || el.hidden || el.classList.contains('leaving')) return;
   clearTimeout(introTimer);
-  if (fast) el.classList.add('skip');
-  setTimeout(() => { el.hidden = true; document.body.classList.remove('intro-on'); maybeAutoTour(); }, fast ? 450 : 0);
+  el.classList.add('leaving');
+  document.body.classList.remove('entered');
+  setTimeout(() => { document.body.classList.remove('intro-on'); document.body.classList.add('entered'); }, fast ? 150 : 300);
+  setTimeout(() => { el.hidden = true; maybeAutoTour(); }, fast ? 800 : 1100);
 }
 function playIntro() {
   const el = $('#intro');
-  const clone = el.cloneNode(true); clone.hidden = false; clone.classList.remove('skip');
+  const clone = el.cloneNode(true); clone.hidden = false; clone.classList.remove('leaving', 'skip');
   el.replaceWith(clone);
-  document.body.classList.add('intro-on'); window.scrollTo(0, 0);
-  introTimer = setTimeout(() => endIntro(false), 5000);
+  if (typeof translateTree === 'function') translateTree(clone);
+  document.body.classList.add('intro-on'); document.body.classList.remove('entered'); window.scrollTo(0, 0);
+  introTimer = setTimeout(() => endIntro(false), 4300);
 }
 
 /* ===================== Старт ===================== */
 (async function init() {
-  const nav = document.querySelector('.topbar');
-  const mnav = document.createElement('nav'); mnav.className = 'mobile-nav'; mnav.id = 'mnav';
-  mnav.innerHTML = $('#nav').innerHTML; nav.after(mnav);
-  const sync = () => $$('#mnav a').forEach((a) => a.classList.toggle('active', a.dataset.nav === (currentNav() === 'contest' ? 'org' : currentNav())));
-  window.addEventListener('hashchange', sync);
+  $('#langMenu').innerHTML = LANGS.map((l) => `<button data-act="setLang" data-lang="${l.code}">${l.label}<small>${l.short}</small></button>`).join('');
+  const syncTabs = () => $$('#tabbar a').forEach((a) => a.classList.toggle('active', a.dataset.nav === (currentNav() === 'contest' ? 'org' : currentNav())));
+  window.addEventListener('hashchange', syncTabs);
   await ensureCrypto();
-  render(); sync();
-  if (new URLSearchParams(location.search).has('nointro') || matchMedia('(prefers-reduced-motion: reduce)').matches) endIntro(true);
-  else introTimer = setTimeout(() => endIntro(false), 5000);
+  render(); syncTabs(); onScroll();
+  startI18n();
+  if (new URLSearchParams(location.search).has('nointro') || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const el = $('#intro'); el.hidden = true; document.body.classList.remove('intro-on'); document.body.classList.add('entered'); maybeAutoTour();
+  } else introTimer = setTimeout(() => endIntro(false), 4300);
 })();
