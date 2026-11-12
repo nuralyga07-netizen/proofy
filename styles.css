@@ -500,3 +500,10 @@ table.t tr.new td { animation: rowNew 2.4s ease; }
 .rank-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .rank-main b { font-size: 16px; }
 @media (max-width: 640px) { .rank-row summary { flex-wrap: wrap; } .rank-row .go { width: 100%; } }
+
+/* ============ Kit ============ */
+.kit-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+@media print {
+  .print-target { width: 100%; display: grid !important; grid-template-columns: 1fr; gap: 24px; }
+  .print-target .cert { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; }
+}

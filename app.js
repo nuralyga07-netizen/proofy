@@ -856,6 +856,33 @@ function viewBuyer(params) {
   </div>`;
 }
 
+/* ===================== НАБОР ДЛЯ ПИТЧА ===================== */
+const PUBLIC_URL = 'https://nuralyga07-netizen.github.io/proofy/';
+function kitCard(title, sub, name, result, contestName, id, tag, tagCls) {
+  return `<div class="kit-item"><div class="kit-label"><span class="badge ${tagCls}">${tag}</span><span class="muted small">${sub}</span></div>
+    <div class="cert" style="max-width:none;aspect-ratio:auto;min-height:280px">
+      <div class="cert-head"><div class="cert-brand"><span class="logo-mark">P</span>PROOFY</div></div>
+      <div class="cert-title">СЕРТИФИКАТ</div>
+      <div class="cert-name">${esc(name)}</div>
+      <div class="cert-result">${esc(result)}</div>
+      <div class="cert-contest">${esc(contestName)}</div>
+      <div class="cert-foot"><span class="cert-id">${esc(id)}</span><div class="qr" data-qr="${esc(PUBLIC_URL + '#/c/' + id)}" data-size="110"></div></div>
+    </div><div class="small muted" style="margin-top:8px">${title}</div></div>`;
+}
+function viewKit() {
+  return `<div class="page wrap">
+  <div class="page-head"><div><div class="eyebrow">Для питча</div><h1>Набор для живого демо</h1>
+    <p class="muted">Распечатайте три карточки. Жюри сканирует QR своим телефоном и видит три разных исхода.</p></div>
+    <button class="btn gold" data-act="printKit">${I.print}Распечатать набор</button></div>
+  <div class="grid g3" id="kit">
+    ${kitCard('Сканирование покажет: «Подлинный сертификат».', 'настоящий', 'А. Н.', 'Победитель', 'Gambit Hackathon 2026 · 14.11.2026', 'PRF-GH26-0001', 'Настоящий', 'ok')}
+    ${kitCard('На бумаге «Победитель», а реестр скажет «Участник».', 'результат подправлен', 'Е. Б.', 'Победитель', 'Областная олимпиада по математике · 20.02.2026', 'PRF-OM26-0003', 'Подправлен', 'warn')}
+    ${kitCard('Такого ID нет в реестре: «Сертификат не найден».', 'ID выдуман', 'Иван Иванов', 'Победитель', 'Международная олимпиада · 01.03.2026', 'PRF-GH26-0999', 'Подделка', 'bad')}
+  </div>
+  <div class="notice warn" style="margin-top:20px">Сертификаты, выданные во время питча с ноутбука, хранятся только в его браузере. На телефоне жюри их не будет, поэтому для сканирования используйте эти три карточки.</div>
+  </div>`;
+}
+
 /* ===================== РЕЙТИНГ КОНКУРСОВ ===================== */
 const rk = { dir: '' };
 function viewRanking() {
@@ -1024,6 +1051,7 @@ function route() {
     case 'buyer': return viewBuyer(params);
     case 'api': return viewApi();
     case 'ranking': return viewRanking();
+    case 'kit': return viewKit();
     default: return viewHome();
   }
 }
@@ -1131,6 +1159,7 @@ document.addEventListener('click', async (e) => {
       toast('Демо-данные сброшены'); break;
     case 'labPreset': Object.assign(lab, LAB_PRESETS[el.dataset.p]); updateLab(); break;
     case 'rankDir': rk.dir = el.dataset.v; render(); break;
+    case 'printKit': { const k = $('#kit'); k.classList.add('print-target'); window.print(); k.classList.remove('print-target'); break; }
     case 'labLevel': lab.level = el.dataset.v; updateLab(); break;
     case 'labToggle': lab[el.dataset.k] = !lab[el.dataset.k]; updateLab(); break;
     case 'scan': openScanner(); break;
