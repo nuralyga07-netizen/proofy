@@ -364,6 +364,8 @@ function viewHome() {
     </div>
   </section>
 
+  <div class="marquee reveal"><div class="marquee-track">${[0, 1].map(() => `<div class="marquee-set">${[...db.orgs.map((o) => [o.name, o.verified]), ['Школьные олимпиады', true], ['Городские конкурсы', true], ['Турниры FTC', true]].map(([n, v]) => `<span class="mq-item">${v ? `<i class="ok-dot"></i>` : '<i class="bad-dot"></i>'}${esc(n)}</span>`).join('')}</div>`).join('')}</div></div>
+
   <section class="wrap section">
     <div class="section-head reveal"><div class="eyebrow">Как это работает</div><h2>Три шага, никаких «загрузите грамоту»</h2></div>
     <div class="flow">
@@ -372,6 +374,52 @@ function viewHome() {
       <div class="flow-step reveal"><div class="flow-num">03</div><div class="flow-ico">${I.shield}</div><h3>Вуз проверяет</h3><p>Видит «подлинный или нет» и вес конкурса.</p></div>
     </div>
   </section>
+
+  <section class="wrap section">
+    <div class="section-head reveal"><div class="eyebrow">Было и стало</div><h2>Грамоту можно нарисовать. Подпись — нет.</h2></div>
+    <div class="ba">
+      <div class="ba-side reveal">
+        <div class="ba-tag bad">Сейчас</div>
+        <div class="paper"><div class="paper-in">
+          <div class="paper-title">ГРАМОТА</div><div class="paper-sub">награждается</div>
+          <div class="paper-name">Иванов Иван</div><div class="paper-sub">за I место в международной олимпиаде</div>
+          <div class="paper-stamp">ПЕЧАТЬ</div><div class="paper-sign">подпись ____</div></div></div>
+        <ul class="ba-list"><li>${I.x}Нарисовать — 2 минуты в редакторе</li><li>${I.x}Проверить — звонить организатору</li><li>${I.x}Неясно, чего стоит конкурс</li></ul>
+      </div>
+      <div class="ba-arrow reveal">${I.arrow}</div>
+      <div class="ba-side reveal">
+        <div class="ba-tag ok">С Proofy</div>
+        <div style="display:grid;place-items:center">${certVisual(db.certs[0])}</div>
+        <ul class="ba-list ok"><li>${I.check}Подпись организатора ECDSA</li><li>${I.check}Проверка по QR за 5 секунд</li><li>${I.check}Вес конкурса из 100</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="phone-sec">
+      <div class="reveal">
+        <div class="eyebrow">Для приёмной комиссии</div>
+        <h2>Навёл камеру — получил ответ</h2>
+        <p class="muted" style="font-size:17px;max-width:440px">Без приложений и регистрации. Обычная камера телефона, одна секунда.</p>
+        <div class="phone-steps">
+          <div><b>1</b><span>Камера видит QR на сертификате</span></div>
+          <div><b>2</b><span>Proofy сверяет подпись организатора</span></div>
+          <div><b>3</b><span>Зелёный — подлинный. Красный — подделка</span></div>
+        </div>
+        <a class="btn lg" href="#/verify" style="margin-top:22px">${I.camera}Попробовать сканер</a>
+      </div>
+      <div class="phone-wrap reveal">
+        <div class="phone"><div class="notch"></div><div class="screen">
+          <div class="scr scr-cam"><div class="cam-cert"><div class="cc-l w70"></div><div class="cc-l w50"></div><div class="cc-qr"></div></div><div class="cam-frame"></div><div class="cam-line"></div><div class="cam-hint">Наведите на QR</div></div>
+          <div class="scr scr-ok"><div class="res-ico">${I.check}</div><div class="res-t">Подлинный</div><div class="res-s">Gambit Hackathon 2026<br>Победитель · вес 77</div><div class="res-pill">подпись верна</div></div>
+          <div class="scr scr-cam2"><div class="cam-cert fake"><div class="cc-l w60"></div><div class="cc-l w40"></div><div class="cc-qr"></div></div><div class="cam-frame"></div><div class="cam-line"></div><div class="cam-hint">Наведите на QR</div></div>
+          <div class="scr scr-bad"><div class="res-ico">${I.x}</div><div class="res-t">Подделка</div><div class="res-s">Такого сертификата<br>нет в реестре</div><div class="res-pill">PRF-GH26-0999</div></div>
+        </div></div>
+        <div class="phone-glow"></div>
+      </div>
+    </div>
+  </section>
+
 
   <section class="wrap section" id="weightLab">
     <div class="section-head reveal"><div class="eyebrow">Попробуйте сами</div><h2>Сколько весит грамота?</h2>
@@ -393,6 +441,12 @@ function viewHome() {
       </div>
       <div class="lab-result" id="labResult">${labResult()}</div>
     </div>
+  </section>
+
+  <section class="wrap section">
+    <div class="section-head reveal"><div class="eyebrow">Разрыв видимости</div><h2>Вузы смотрят в две точки. Таланты — по всей стране.</h2>
+      <p class="muted">Золотые точки — где ищут сейчас. Голубые — школьники, которых Proofy делает видимыми.</p></div>
+    <div class="card glow map-card reveal">${talentMap()}</div>
   </section>
 
   <section class="wrap section">
@@ -421,6 +475,39 @@ function labResult() {
   const verdict = w.total >= 70 ? '<span class="badge ok">Сильный конкурс</span>' : w.total >= 40 ? '<span class="badge warn">Средний вес</span>' : '<span class="badge bad">Почти ничего не значит</span>';
   return `${ring(w.total, 180, 'из 100', 14)}<div class="verdict-line">${verdict}</div>${breakdown(w)}`;
 }
+/* Схематичная карта: координаты примерно по долготе и широте */
+const MAP_PTS = {
+  'Уральск': [120, 128], 'Атырау': [129, 228], 'Костанай': [346, 83], 'Караганда': [522, 165], 'Павлодар': [593, 103],
+  'Усть-Каменогорск': [698, 160], 'Шымкент': [457, 330], 'Кызылорда': [372, 272], 'Тараз': [512, 318],
+  'Актобе': [222, 146], 'Хромтау': [262, 136], 'Кандыагаш': [214, 176], 'Эмба': [252, 192], 'Шалкар': [284, 222],
+  'Астана': [491, 128], 'Алматы': [593, 307],
+};
+const HUBS = ['Астана', 'Алматы'];
+function talentMap() {
+  const counts = {};
+  db.students.forEach((s) => { counts[s.city] = (counts[s.city] || 0) + 1; });
+  const regional = Object.keys(counts).filter((c) => !HUBS.includes(c) && MAP_PTS[c]);
+  const lines = regional.flatMap((c, i) => HUBS.map((h, j) => {
+    const [x1, y1] = MAP_PTS[c], [x2, y2] = MAP_PTS[h];
+    const mx = (x1 + x2) / 2, my = Math.min(y1, y2) - 60;
+    return `<path d="M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}" class="map-line" style="animation-delay:${(i * 2 + j) * .35}s"/>`;
+  })).join('');
+  const dots = Object.entries(MAP_PTS).map(([c, [x, y]]) => {
+    const hub = HUBS.includes(c), n = counts[c] || 0;
+    if (hub) return `<g class="map-hub"><circle cx="${x}" cy="${y}" r="16" class="hub-halo"/><circle cx="${x}" cy="${y}" r="7"/><text x="${x}" y="${y - 24}" text-anchor="middle">${c}</text></g>`;
+    if (n) {
+      const right = ['Хромтау', 'Эмба', 'Шалкар'].includes(c);
+      return `<g class="map-talent"><circle cx="${x}" cy="${y}" r="${6 + n * 3}" class="pulse-ring"/><circle cx="${x}" cy="${y}" r="5"/>
+        <text x="${right ? x + 14 : x - 14}" y="${y + 4}" text-anchor="${right ? 'start' : 'end'}">${c} · ${n}</text></g>`;
+    }
+    return `<g class="map-city"><circle cx="${x}" cy="${y}" r="3"/><text x="${x}" y="${y + 18}" text-anchor="middle">${c}</text></g>`;
+  }).join('');
+  return `<svg viewBox="40 40 720 330" class="kz-map" role="img" aria-label="Схема: школьники из малых городов Актюбинской области становятся видимыми для вузов Астаны и Алматы">
+    <defs><pattern id="dotgrid" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="rgba(255,255,255,.07)"/></pattern></defs>
+    <rect x="40" y="40" width="720" height="330" fill="url(#dotgrid)"/>${lines}${dots}</svg>
+    <div class="map-legend"><span><i class="lg-hub"></i>Где ищут сейчас</span><span><i class="lg-tal"></i>Проверенные школьники · число</span><span class="muted small">Схема, не в масштабе</span></div>`;
+}
+
 function updateLab() {
   const box = $('#labResult'); if (!box) return;
   box.innerHTML = labResult();
@@ -1205,6 +1292,8 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeMod
 
 /* 3D-наклон сертификата */
 document.addEventListener('mousemove', (e) => {
+  const sp = e.target.closest('.card, .stat-card, .flow-step, .role-card, .talent, .privacy > div');
+  if (sp) { const r = sp.getBoundingClientRect(); sp.style.setProperty('--mx', `${e.clientX - r.left}px`); sp.style.setProperty('--my', `${e.clientY - r.top}px`); }
   const c = e.target.closest('[data-tilt]');
   $$('[data-tilt]').forEach((x) => { if (x !== c) x.style.transform = ''; });
   if (!c) return;
