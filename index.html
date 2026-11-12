@@ -24,20 +24,22 @@
         <div class="intro-mark">P</div>
         <div class="intro-word"><span>P</span><span>R</span><span>O</span><span>O</span><span>F</span><span>Y</span></div>
       </div>
-      <div class="intro-cert">
-        <div class="ic-top"><i></i><i></i></div>
-        <div class="ic-title">СЕРТИФИКАТ</div>
-        <div class="ic-line w70"></div>
-        <div class="ic-line w50"></div>
-        <div class="ic-line w60"></div>
-        <div class="ic-qr"></div>
-        <div class="ic-scan"></div>
-        <div class="ic-stamp">ПОДЛИННЫЙ<b>✓</b></div>
+      <div class="icerts">
+        <div class="icert fake">
+          <div class="ic-seal"></div><div class="ic-line dark w70"></div><div class="ic-line dark w50"></div><div class="ic-line dark w60"></div>
+          <div class="ic-scan red"></div>
+          <div class="ic-mark bad"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+        </div>
+        <div class="icert real">
+          <div class="ic-top"><i></i><i></i></div><div class="ic-line gold w40"></div><div class="ic-line w70"></div><div class="ic-line w50"></div>
+          <div class="ic-qr"></div>
+          <div class="ic-scan"></div>
+          <div class="ic-mark ok"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        </div>
       </div>
-      <div class="intro-tag"><span>Талант виден.</span> <em>Подделка — нет.</em></div>
     </div>
     <div class="intro-progress"><i></i></div>
-    <button class="intro-skip" data-act="skipIntro">Пропустить</button>
+    <button class="intro-skip" data-act="skipIntro" aria-label="Пропустить"><svg viewBox="0 0 24 24"><path d="M5 5l8 7-8 7M13 5l8 7-8 7"/></svg></button>
   </div>
 
   <header class="topbar" id="topbar">
@@ -53,6 +55,7 @@
       </nav>
       <div class="top-actions">
         <a href="#/api" class="api-pill" id="apiPill" title="Состояние API"><i></i><span id="apiMs">API · онлайн</span></a>
+        <a href="#/register" class="reg-btn" id="regBtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span>Регистрация</span></a>
         <div class="lang" id="langBox">
           <button class="lang-btn" data-act="langToggle" title="Язык" aria-haspopup="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg><b data-lang-current>RU</b></button>
           <div class="lang-menu" id="langMenu" hidden></div>

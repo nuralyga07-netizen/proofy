@@ -24,6 +24,17 @@ const DIRECTIONS = ['IT', 'Математика', 'Робототехника', 
 const CITIES = ['Актобе', 'Хромтау', 'Кандыагаш', 'Шалкар', 'Эмба', 'Алматы', 'Астана'];
 const PURPOSES = ['Грант на обучение', 'Стажировка', 'Консультация по поступлению', 'Летняя школа'];
 
+/* Резюме тестовых школьников: кто он, что делает, чем известен */
+const PROFILES = {
+  s1: { headline: 'Пишет на Python и делает Telegram-ботов', fame: 'Победила на Gambit Hackathon 2026', about: 'Сделала бота школьного расписания, им пользуются 600 учеников. Хочет учиться на программиста.', skills: ['Python', 'Telegram-боты', 'Figma'], projects: [['Бот расписания', 'Telegram-бот для 600 учеников школы']] },
+  s2: { headline: 'Капитан команды по робототехнике', fame: 'Привёл команду к победе на областном турнире FTC', about: 'Собирает роботов с 8 класса и учит младших программировать на C++.', skills: ['C++', 'Arduino', 'CAD'], projects: [['Робот-сортировщик', 'Робот для турнира FTC, собран за 6 недель']] },
+  s3: { headline: 'Олимпиадная математика', fame: 'Победительница областной олимпиады по математике', about: 'Решает задачи по комбинаторике и бесплатно ведёт кружок для младших.', skills: ['Комбинаторика', 'Геометрия', 'Теория чисел'], projects: [['Кружок для младших', 'Занятия для учеников 5–7 классов']] },
+  s4: { headline: 'Спортивное программирование', fame: 'Победитель республиканской олимпиады по информатике', about: 'Готовится к международной олимпиаде.', skills: ['C++', 'Алгоритмы'], projects: [] },
+  s5: { headline: 'Инженер-конструктор', fame: 'Призёр областного турнира FTC', about: 'Проектирует детали в CAD и печатает их на 3D-принтере.', skills: ['3D-печать', 'CAD', 'Электроника'], projects: [['Протез-манипулятор', 'Прототип кисти руки из 3D-печати']] },
+  s6: { headline: 'Любит алгебру', fame: 'Участник областной олимпиады по математике', about: 'Готовится к областной олимпиаде следующего года.', skills: ['Алгебра'], projects: [] },
+};
+const emptyProfile = () => ({ headline: '', fame: '', about: '', skills: [], projects: [] });
+
 /* ---------------- Иконки ---------------- */
 const svg = (d, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
 const I = {
@@ -213,6 +224,7 @@ const kidFmt = (kid) => (kid || '').toUpperCase().match(/.{1,4}/g)?.join(':') ||
 
 async function ensureCrypto() {
   let changed = false;
+  for (const s of db.students) if (!s.profile) { s.profile = JSON.parse(JSON.stringify(PROFILES[s.id] || emptyProfile())); changed = true; }
   db.keys = db.keys || {};
   if (HAS_CRYPTO) {
     for (const o of db.orgs) if (!db.keys[o.id]) { db.keys[o.id] = await genKeys(); changed = true; }
@@ -719,7 +731,7 @@ function viewOrg() {
         <label class="field"><span>Название</span><input type="text" name="name" required placeholder="Городская олимпиада по физике"></label>
         <div class="grid g2">
           <label class="field"><span>Уровень</span><select name="level">${Object.entries(LEVELS).map(([k, l]) => `<option value="${k}" ${k === 'city' ? 'selected' : ''}>${l.label}</option>`).join('')}</select></label>
-          <label class="field"><span>Направление</span><select name="direction">${DIRECTIONS.map((d) => `<option>${d}</option>`).join('')}</select></label>
+          <label class="field"><span>Направление</span><select name="direction">${DIRECTIONS.map((d) => `<option value="${d}">${d}</option>`).join('')}</select></label>
           <label class="field"><span>Участников</span><input type="number" name="participants" value="200" min="1"></label>
           <label class="field"><span>Наградили, %</span><input type="number" name="awarded" value="15" min="0" max="100"></label>
         </div>
@@ -859,6 +871,15 @@ function viewStudent() {
       </div>
       <div class="card" id="previewBox"><h3>${I.eye.replace('<svg', '<svg style="width:18px;height:18px;vertical-align:-3px;margin-right:6px"')}Так вас видит вуз</h3>
         ${s.parent && s.search ? talentCard(s, { preview: true }) : `<div class="lock">${I.lock}Вас нет в поиске. Вуз может только проверить сертификат по ID.</div>`}</div>
+      <form class="card" data-form="profile" id="profileBox"><h3>Моё резюме</h3>
+        <div class="stack">
+          <label class="field"><span>Кто я в одной фразе</span><input type="text" name="headline" value="${esc(s.profile?.headline)}" placeholder="Пишу на Python и делаю ботов"></label>
+          <label class="field"><span>Чем я известен</span><input type="text" name="fame" value="${esc(s.profile?.fame)}" placeholder="Победил на хакатоне"></label>
+          <label class="field"><span>О себе</span><textarea name="about" style="min-height:90px;font-family:Inter">${esc(s.profile?.about)}</textarea></label>
+          <label class="field"><span>Навыки через запятую</span><input type="text" name="skills" value="${esc((s.profile?.skills || []).join(', '))}" placeholder="Python, Figma"></label>
+          <div class="row"><button class="btn sm" type="submit">${I.check}Сохранить</button><a class="btn ghost sm" href="#/p/${s.id}">${I.eye}Посмотреть резюме</a></div>
+        </div>
+      </form>
       <div class="card"><h3>Полезно уже сейчас</h3>
         ${s.portfolio ? `<div class="row"><a class="btn sm" href="#/p/${s.id}">${I.eye}Моё портфолио</a><button class="btn ghost sm" data-act="copy" data-text="${esc(location.origin + location.pathname + '#/p/' + s.id)}">${I.link}Копировать ссылку</button></div>` : '<p class="muted small">Включите публичное портфолио, чтобы прикладывать его к заявкам.</p>'}
         ${rec.length ? `<p class="small" style="margin:16px 0 6px"><b>Сильные конкурсы по направлению «${esc(s.direction)}»</b></p>${rec.map((k) => `<div class="talent-ach"><span>${esc(k.name)}</span>${wbar(contestWeight(k).total)}</div>`).join('')}` : ''}
@@ -870,15 +891,57 @@ function sw(s, field, title, hint, disabled) {
   return `<label class="switch ${disabled ? 'disabled' : ''}"><input type="checkbox" data-change="toggle" data-field="${field}" ${s[field] ? 'checked' : ''} ${disabled ? 'disabled' : ''}><span class="knob"></span>
     <span><b>${title}</b><span class="muted small">${hint}</span></span></label>`;
 }
-function viewPortfolio(id) {
+/* Резюме таланта: #/p/:id — публичная ссылка школьника, #/t/:id — просмотр из кабинета вуза */
+function viewResume(id, mode) {
   const s = student(id);
-  if (!s || !s.portfolio) return `<div class="page wrap"><div class="card empty">${I.lock}<h2>Портфолио скрыто</h2><p>Владелец не открыл публичную ссылку.</p></div></div>`;
-  const certs = certsOf(s.id).slice().sort((a, b) => certPoints(b) - certPoints(a));
+  const allowed = s && (mode === 'public' ? s.portfolio : (s.parent && s.search));
+  if (!allowed) {
+    return `<div class="page wrap"><div class="card empty">${I.lock}<h2>Резюме скрыто</h2><p>${mode === 'public' ? 'Владелец не открыл публичную ссылку.' : 'Школьник не дал согласия на показ в поиске.'}</p>
+      <a class="btn ghost" href="#/buyer">← К талантам</a></div></div>`;
+  }
+  const p = s.profile || emptyProfile();
+  const b = buyer(db.session.buyerId);
+  const req = mode === 'buyer' ? db.requests.find((r) => r.studentId === s.id && r.buyerId === b.id) : null;
+  const open = req && req.status === 'approved';
+  const title = open || s.showName ? s.name : `Школьник, ${s.grade} класс`;
+  const certs = certsOf(s.id).slice().sort((a, c) => certPoints(c) - certPoints(a));
+  let action = '';
+  if (mode === 'buyer') {
+    if (!req) action = `<select id="purpose-${s.id}" style="margin-bottom:10px">${PURPOSES.map((x) => `<option value="${x}">${x}</option>`).join('')}</select><button class="btn" style="width:100%" data-act="request" data-sid="${s.id}">Запросить контакт</button>`;
+    else if (req.status === 'pending') action = `<div class="lock">${I.spark}Запрос отправлен. Ждём ответа школьника.</div>`;
+    else if (req.status === 'declined') action = `<div class="lock">${I.x}Школьник отклонил запрос.</div>`;
+    else action = `<div class="notice">Контакт: <b>${esc(s.contact)}</b><br><span class="small">${esc(s.school)}</span></div>`;
+  }
   return `<div class="page wrap">
-  <div class="page-head"><div class="row">${avatar(s, 'lg')}<div><div class="eyebrow">Проверенное портфолио</div><h1 style="margin:0">${esc(shownName(s))}</h1>
-    <p class="muted">${s.grade} класс · ${esc(s.city)} · ${esc(s.direction)}</p></div></div>${ring(Math.min(100, rating(s.id)), 110, 'баллов', 10).replace(`data-count="${Math.min(100, rating(s.id))}"`, `data-count="${rating(s.id)}"`)}</div>
-  <div class="grid g3">${certs.map((c) => `<a href="#/c/${c.id}">${certVisual(c)}</a>`).join('')}</div>
-  <p class="muted small" style="margin-top:16px">Каждый сертификат выдан организатором и проверяется по QR.</p></div>`;
+  <p><a href="${mode === 'buyer' ? '#/buyer' : '#/'}">← ${mode === 'buyer' ? 'К талантам' : 'На главную'}</a></p>
+  <div class="card glow resume-hero">
+    ${avatar(s, 'xl')}
+    <div><div class="eyebrow">Резюме таланта</div><h1>${esc(title)}</h1>
+      <div class="muted">${s.grade} класс · ${esc(s.city)} · ${esc(s.direction)}</div>
+      ${p.headline ? `<p style="font-size:18px;margin:10px 0 0">${esc(p.headline)}</p>` : ''}
+      ${p.fame ? `<div class="fame">${I.spark}<span>${esc(p.fame)}</span></div>` : ''}
+    </div>
+    ${ring(Math.min(100, rating(s.id)), 120, 'баллов', 10).replace(`data-count="${Math.min(100, rating(s.id))}"`, `data-count="${rating(s.id)}"`)}
+  </div>
+  <div class="grid side" style="margin-top:18px">
+    <div class="stack">
+      ${p.about ? `<div class="card"><h3>О себе</h3><p style="margin:0">${esc(p.about)}</p></div>` : ''}
+      ${p.skills?.length ? `<div class="card"><h3>Навыки</h3><div class="skills">${p.skills.map((k) => `<span class="skill">${esc(k)}</span>`).join('')}</div></div>` : ''}
+      ${p.projects?.length ? `<div class="card"><h3>Проекты</h3><div class="grid g2">${p.projects.map(([t, d]) => `<div class="project"><b>${esc(t)}</b><span class="muted small">${esc(d)}</span></div>`).join('')}</div></div>` : ''}
+      <div class="card"><h3>Подтверждённые достижения</h3>
+        ${certs.length ? `<div class="timeline">${certs.map((c) => { const k = contest(c.contestId); return `<div class="tl-item"><div class="row between"><b>${esc(k.name)}</b>${wbar(contestWeight(k).total)}</div>
+          <div class="muted small">${RESULTS[c.result].label} · ${fmtDate(k.date)} · ${esc(org(k.orgId).name)}</div>
+          <a class="small" href="#/c/${c.id}">${I.shield.replace('<svg', '<svg style="width:13px;height:13px;vertical-align:-2px"')} Проверить ${esc(c.id)}</a></div>`; }).join('')}</div>`
+          : `<div class="empty">Пока нет подтверждённых достижений.</div>`}
+      </div>
+    </div>
+    <div class="stack">
+      ${mode === 'buyer' ? `<div class="card glow"><h3>Связаться</h3>${action}${!open ? `<div class="lock">${I.lock}Имя и контакт откроются после согласия школьника</div>` : ''}</div>` : ''}
+      <div class="card"><h3>Коротко</h3>
+        <dl class="kv"><dt>Класс</dt><dd>${s.grade}</dd><dt>Город</dt><dd>${esc(s.city)}</dd><dt>Направление</dt><dd>${esc(s.direction)}</dd><dt>Баллы</dt><dd>${rating(s.id)}</dd></dl></div>
+      <div class="card"><p class="muted small" style="margin:0">Каждое достижение выдано организатором конкурса и подписано его ключом. Школьник сам не может их добавить.</p></div>
+    </div>
+  </div></div>`;
 }
 
 /* ===================== ПОКУПАТЕЛЬ ===================== */
@@ -891,7 +954,7 @@ function talentCard(s, opts = {}) {
   const title = open || s.showName ? s.name : `Школьник, ${s.grade} класс`;
   let action = '';
   if (!opts.preview) {
-    if (!req) action = `<div class="row" style="margin-top:14px"><select id="purpose-${s.id}" style="flex:1;min-width:150px">${PURPOSES.map((p) => `<option>${p}</option>`).join('')}</select><button class="btn sm" data-act="request" data-sid="${s.id}">Запросить контакт</button></div>`;
+    if (!req) action = `<div class="row" style="margin-top:14px"><select id="purpose-${s.id}" style="flex:1;min-width:150px">${PURPOSES.map((p) => `<option value="${p}">${p}</option>`).join('')}</select><button class="btn sm" data-act="request" data-sid="${s.id}">Запросить контакт</button></div>`;
     else if (req.status === 'pending') action = `<div class="lock">${I.spark}Запрос отправлен. Ждём ответа школьника.</div>`;
     else if (req.status === 'declined') action = `<div class="lock">${I.x}Школьник отклонил запрос.</div>`;
     else action = `<div class="notice" style="margin-top:14px">${I.check.replace('<svg', '<svg style="width:16px;height:16px;vertical-align:-3px"')} Контакт: <b>${esc(s.contact)}</b><br><span class="small">${esc(s.school)}</span></div>`;
@@ -900,7 +963,10 @@ function talentCard(s, opts = {}) {
     <div class="talent-head">${avatar(s)}<div style="flex:1;min-width:0"><div class="talent-name">${esc(title)}</div>
       <div class="muted small">${I.map.replace('<svg', '<svg style="width:13px;height:13px;vertical-align:-2px"')} ${esc(s.city)} · ${esc(s.direction)}</div></div>
       <div class="pts">${rating(s.id)}<small>баллов</small></div></div>
+    ${s.profile?.headline ? `<div class="headline">${esc(s.profile.headline)}</div>` : ''}
+    ${s.profile?.fame ? `<div class="fame-line">${I.spark}<span>${esc(s.profile.fame)}</span></div>` : ''}
     ${certs.map((c) => { const k = contest(c.contestId); return `<div class="talent-ach"><span><a href="#/c/${c.id}">${esc(k.name)}</a> · ${RESULTS[c.result].label}</span>${wbar(contestWeight(k).total)}</div>`; }).join('')}
+    ${!opts.preview ? `<div class="talent-actions"><a class="btn ghost sm" href="#/t/${s.id}">${I.doc}Открыть резюме</a></div>` : ''}
     ${!opts.preview && !open ? `<div class="lock">${I.lock}Имя и контакт откроются после согласия школьника</div>` : ''}
     ${action}</div>`;
 }
@@ -939,6 +1005,99 @@ function viewBuyer(params) {
   ${found.length ? `<div class="grid g2" id="talents">${found.map((s, i) => talentCard(s).replace('class="talent"', `class="talent" style="animation-delay:${i * 70}ms"`)).join('')}</div>` : `<div class="card empty">${I.search}<div>Никого не нашли. Ослабьте фильтры.</div></div>`}`}
   </div>`;
 }
+
+/* ===================== РЕГИСТРАЦИЯ ===================== */
+const reg = { step: 1, role: null, method: null, age: null, err: '' };
+const ROLE_INFO = {
+  student: ['Школьник', 'Портфолио и резюме, которым верят вузы', I.user],
+  org: ['Организатор конкурса', 'Выдавать сертификаты с подписью', I.building],
+  buyer: ['Вуз или агентство', 'Искать и проверять таланты', I.search],
+};
+const GOOGLE_SVG = '<svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+
+function iinInfo(iin) {
+  if (!/^\d{12}$/.test(iin)) return { ok: false, err: 'ИИН должен состоять из 12 цифр' };
+  const d = iin.split('').map(Number);
+  let sum = d.slice(0, 11).reduce((a, v, i) => a + v * (i + 1), 0) % 11;
+  if (sum === 10) { const w = [3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2]; sum = d.slice(0, 11).reduce((a, v, i) => a + v * w[i], 0) % 11; }
+  if (sum === 10 || sum !== d[11]) return { ok: false, err: 'Контрольная цифра ИИН не сходится' };
+  const century = { 1: 1800, 2: 1800, 3: 1900, 4: 1900, 5: 2000, 6: 2000 }[d[6]];
+  if (!century) return { ok: false, err: 'Неверная цифра века в ИИН' };
+  const born = new Date(century + +iin.slice(0, 2), +iin.slice(2, 4) - 1, +iin.slice(4, 6));
+  const age = Math.floor((Date.now() - born) / (365.25 * 864e5));
+  return { ok: true, age };
+}
+function demoIin() {
+  // Тестовый ИИН 15-летнего школьника с правильной контрольной цифрой
+  for (let n = 1; n < 1000; n++) {
+    const base = `100315500${String(n).padStart(3, '0')}`.slice(0, 11);
+    const r = iinInfo(base + '0'); if (r.ok) return base + '0';
+    for (let c = 1; c < 10; c++) if (iinInfo(base + c).ok) return base + c;
+  }
+  return '';
+}
+
+function viewRegister() {
+  const bar = `<div class="steps-bar">${[1, 2, 3, 4].map((i) => `<i class="${i <= reg.step ? 'on' : ''}"></i>`).join('')}</div>`;
+  let body = '';
+  if (reg.step === 1) {
+    body = `<h2>Кто вы?</h2><p class="muted">Выберите роль. Её можно поменять позже.</p>
+      <div class="choice-grid">${Object.entries(ROLE_INFO).map(([k, [t, d, ic]]) => `<button class="choice ${reg.role === k ? 'on' : ''}" data-act="regRole" data-v="${k}"><div class="flow-ico">${ic}</div><b>${t}</b><span>${d}</span></button>`).join('')}</div>`;
+  } else if (reg.step === 2) {
+    body = `<h2>Как войти?</h2><p class="muted">${ROLE_INFO[reg.role][0]} · выберите удобный способ</p>
+      <div class="stack" style="max-width:520px">
+        <button class="auth-btn" data-act="regGoogle" id="googleBtn"><span class="ab-ico">${GOOGLE_SVG}</span><span>Продолжить с Google<small>Быстрее всего, без пароля</small></span></button>
+        <div class="or">или</div>
+        <form data-form="regIin" class="stack">
+          <div class="auth-btn egov" style="cursor:default"><span class="ab-ico">eGov</span><span>Через ИИН<small>Проверяем через eGov и не храним</small></span></div>
+          <input type="text" name="iin" class="iin-input" inputmode="numeric" maxlength="12" placeholder="000000000000" autocomplete="off">
+          <div class="row between"><button class="link-btn small" type="button" data-act="regDemoIin">Подставить тестовый ИИН</button><button class="btn" type="submit">Продолжить</button></div>
+        </form>
+        <div class="or">или</div>
+        <form data-form="regMail" class="row">
+          <input type="text" name="email" placeholder="name@example.com" style="flex:1;min-width:200px" autocomplete="off">
+          <button class="btn ghost" type="submit">По email</button>
+        </form>
+        ${reg.err ? `<div class="notice bad">${esc(reg.err)}</div>` : ''}
+        <button class="link-btn small" data-act="regBack">← Назад</button>
+      </div>`;
+  } else if (reg.step === 3) {
+    const minor = reg.age !== null && reg.age < 18;
+    const via = { google: 'Google', iin: 'eGov', email: 'email' }[reg.method];
+    let fields = '';
+    if (reg.role === 'student') {
+      fields = `<div class="grid g2">
+          <label class="field"><span>Имя и фамилия</span><input type="text" name="name" required placeholder="Алия Серикова"></label>
+          <label class="field"><span>Класс</span><select name="grade">${[8, 9, 10, 11].map((g) => `<option value="${g}">${g}</option>`).join('')}</select></label>
+          <label class="field"><span>Город</span><select name="city">${CITIES.map((c) => `<option value="${c}">${c}</option>`).join('')}</select></label>
+          <label class="field"><span>Направление</span><select name="direction">${DIRECTIONS.map((d) => `<option value="${d}">${d}</option>`).join('')}</select></label>
+        </div>
+        <label class="field"><span>Школа</span><input type="text" name="school" required placeholder="СОШ №12"></label>
+        <label class="field"><span>Кто я в одной фразе</span><input type="text" name="headline" placeholder="Пишу на Python и делаю ботов"></label>
+        <label class="switch"><input type="checkbox" name="parent" ${minor ? '' : 'checked'}><span class="knob"></span><span><b>Родитель согласен</b><span class="muted small">${minor ? 'Вам меньше 18 лет: нужно согласие родителя. В рабочей версии — SMS-код родителю.' : 'В рабочей версии — SMS-код родителю'}</span></span></label>`;
+    } else {
+      fields = `<label class="field"><span>Название организации</span><input type="text" name="name" required placeholder="${reg.role === 'org' ? 'Городская олимпиада по физике' : 'Агентство «Bilim Path»'}"></label>
+        <label class="field"><span>Город</span><select name="city">${CITIES.map((c) => `<option value="${c}">${c}</option>`).join('')}</select></label>
+        ${reg.role === 'org' ? '<p class="muted small">Новый организатор сначала «не подтверждён». Мы проверим сайт и письмо с домена организации.</p>' : ''}`;
+    }
+    body = `<h2>Расскажите о себе</h2><p class="muted"><span class="badge sky">Вход через ${via}</span>${reg.age !== null ? ` <span class="badge ok">ИИН проверен</span>` : ''}</p>
+      <form data-form="regDetails" class="stack" style="max-width:620px">${fields}
+        ${reg.err ? `<div class="notice bad">${esc(reg.err)}</div>` : ''}
+        <div class="row between"><button class="link-btn small" type="button" data-act="regBack">← Назад</button><button class="btn gold lg" type="submit">${I.check}Создать аккаунт</button></div>
+      </form>`;
+  } else {
+    const target = { student: '#/student', org: '#/org', buyer: '#/buyer' }[reg.role];
+    body = `<div class="success-burst"><div class="res-ico">${I.check}</div><h2>Аккаунт создан</h2>
+      <p class="muted">Добро пожаловать в Proofy. Ваш кабинет уже готов.</p>
+      <div class="row" style="justify-content:center;margin-top:18px"><a class="btn lg" href="${target}" data-act="regDone">Открыть кабинет ${I.arrow}</a></div></div>`;
+  }
+  return `<div class="page wrap reg-wrap">
+    <div class="page-head"><div><div class="eyebrow">Регистрация</div><h1>Создайте аккаунт</h1><p class="muted">Меньше минуты. Данные школьников скрыты по умолчанию.</p></div></div>
+    <div class="card glow">${bar}${body}</div>
+    <p class="muted small" style="margin-top:14px">Прототип: вход через Google и eGov имитируется, пароли и ИИН никуда не отправляются.</p>
+  </div>`;
+}
+function regGo(step) { reg.step = step; reg.err = ''; render(); window.scrollTo(0, 0); }
 
 /* ===================== НАБОР ДЛЯ ПИТЧА ===================== */
 const PUBLIC_URL = 'https://nuralyga07-netizen.github.io/proofy/';
@@ -1132,7 +1291,9 @@ function route() {
     case 'c': return viewVerify(new URLSearchParams({ id: parts[1] || '' }));
     case 'org': return parts[1] === 'k' ? viewContest(parts[2]) : viewOrg();
     case 'student': return viewStudent();
-    case 'p': return viewPortfolio(parts[1]);
+    case 'p': return viewResume(parts[1], 'public');
+    case 't': return viewResume(parts[1], 'buyer');
+    case 'register': return viewRegister();
     case 'buyer': return viewBuyer(params);
     case 'api': return viewApi();
     case 'ranking': return viewRanking();
@@ -1204,6 +1365,40 @@ document.addEventListener('submit', async (e) => {
     const res = await API.createContest(data);
     toast('Конкурс создан'); location.hash = `#/org/k/${res.data.contest.id}`;
   } else if (kind === 'issue') issueCerts(form);
+  else if (kind === 'regIin') {
+    const r = iinInfo(String(new FormData(form).get('iin') || '').trim());
+    if (!r.ok) { reg.err = r.err; render(); return; }
+    reg.method = 'iin'; reg.age = r.age; regGo(3);
+  } else if (kind === 'regMail') {
+    const email = String(new FormData(form).get('email') || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { reg.err = 'Проверьте email'; render(); return; }
+    reg.method = 'email'; reg.age = null; regGo(3);
+  } else if (kind === 'regDetails') {
+    const f = new FormData(form);
+    const name = String(f.get('name') || '').trim();
+    if (!name) return;
+    if (reg.role === 'student') {
+      const minor = reg.age !== null && reg.age < 18;
+      if (minor && f.get('parent') !== 'on') { reg.err = 'Без согласия родителя аккаунт школьника младше 18 лет создать нельзя'; render(); return; }
+      const s = { id: 's' + (++db.seq), name, grade: +f.get('grade'), city: f.get('city'), school: String(f.get('school') || '').trim(), direction: f.get('direction'),
+        parent: f.get('parent') === 'on', search: false, showName: false, portfolio: false, contact: `student${db.seq}.test@example.com`,
+        profile: { ...emptyProfile(), headline: String(f.get('headline') || '').trim() } };
+      db.students.push(s); db.session.studentId = s.id;
+    } else if (reg.role === 'org') {
+      const o = { id: 'o' + (++db.seq), name, city: f.get('city'), verified: false };
+      db.orgs.push(o); db.session.orgId = o.id;
+      if (HAS_CRYPTO) db.keys[o.id] = await genKeys();
+    } else {
+      const b = { id: 'b' + (++db.seq), name, type: 'Образовательное агентство' };
+      db.buyers.push(b); db.session.buyerId = b.id;
+    }
+    save(); regGo(4); toast('Аккаунт создан');
+  } else if (kind === 'profile') {
+    const f = new FormData(form), s = student(db.session.studentId);
+    s.profile = { ...(s.profile || emptyProfile()), headline: String(f.get('headline') || '').trim(), fame: String(f.get('fame') || '').trim(),
+      about: String(f.get('about') || '').trim(), skills: String(f.get('skills') || '').split(',').map((x) => x.trim()).filter(Boolean) };
+    save(); render(); toast('Резюме сохранено');
+  }
 });
 
 document.addEventListener('input', (e) => {
@@ -1232,6 +1427,14 @@ document.addEventListener('click', async (e) => {
   const act = el.dataset.act;
   switch (act) {
     case 'skipIntro': endIntro(true); break;
+    case 'regRole': reg.role = el.dataset.v; regGo(2); break;
+    case 'regBack': regGo(Math.max(1, reg.step - 1)); break;
+    case 'regDemoIin': { const inp = $('[data-form="regIin"] input'); inp.value = demoIin(); inp.focus(); break; }
+    case 'regGoogle': {
+      el.disabled = true; el.querySelector('small').textContent = 'Подключаемся к Google…';
+      await sleep(900); reg.method = 'google'; reg.age = null; regGo(3); break;
+    }
+    case 'regDone': reg.step = 1; reg.role = null; reg.method = null; reg.age = null; break;
     case 'langToggle': { const m = $('#langMenu'); m.hidden = !m.hidden; break; }
     case 'setLang': setLang(el.dataset.lang); $('#langMenu').hidden = true; break;
     case 'toTop': window.scrollTo({ top: 0, behavior: 'smooth' }); break;
@@ -1376,9 +1579,9 @@ function playIntro() {
   $('#langMenu').innerHTML = LANGS.map((l) => `<button data-act="setLang" data-lang="${l.code}">${l.label}<small>${l.short}</small></button>`).join('');
   const syncTabs = () => $$('#tabbar a').forEach((a) => a.classList.toggle('active', a.dataset.nav === (currentNav() === 'contest' ? 'org' : currentNav())));
   window.addEventListener('hashchange', syncTabs);
+  startI18n();
   await ensureCrypto();
   render(); syncTabs(); onScroll();
-  startI18n();
   if (new URLSearchParams(location.search).has('nointro') || matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const el = $('#intro'); el.hidden = true; document.body.classList.remove('intro-on'); document.body.classList.add('entered'); maybeAutoTour();
   } else introTimer = setTimeout(() => endIntro(false), 4300);
