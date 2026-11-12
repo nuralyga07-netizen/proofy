@@ -60,6 +60,74 @@ main { padding-top: 84px; }
 .sticky-cta:active { transform: translate(-50%, 0) scale(.96); }
 @media (max-width: 900px) { .sticky-cta { display: none; } }
 
+/* ================= Ничего не вылезает за экран ================= */
+html, body { overflow-x: clip; max-width: 100%; }
+.cert { overflow: hidden; }
+.phone-glow { width: min(380px, 90vw); height: min(380px, 90vw); }
+@media (max-width: 900px) {
+  .devices .orbit { display: none; }
+  .lt-base { margin: 0 -3%; }
+  .hero { gap: 24px; padding-top: 28px !important; }
+  .hero h1 { font-size: clamp(40px, 12vw, 56px); }
+  .hero .lead { font-size: 16px; margin: 14px 0 22px; }
+  #heroCta .btn { flex: 1 1 100%; }
+  .devices { min-height: 0; padding: 30px 0 10px; }
+  .devices .laptop { width: 88%; transform: none; }
+  .phone.mini { width: 108px; height: 222px; border-radius: 24px; padding: 6px; right: 0; bottom: -6px; }
+  .phone.mini .screen { border-radius: 19px; }
+  .phone.mini .notch { width: 40px; height: 12px; top: 9px; }
+  .devices .float-tag.t1 { top: 0; left: 0; }
+  .devices .float-tag.t2 { display: none; }
+  .topbar-in { padding: 0 10px; }
+  .topbar .logo { height: 46px; padding: 0 14px 0 7px; font-size: 17px; }
+  .topbar .logo .logo-mark { width: 30px; height: 30px; }
+  .topbar .top-actions { height: 46px; padding: 0 5px; gap: 4px; }
+  .topbar .lang-btn { padding: 0 10px; height: 34px; }
+  .topbar .icon-btn { width: 34px; height: 34px; }
+  .reg-btn { height: 34px; }
+  main { padding-top: 74px; }
+  .section { padding-top: 54px !important; }
+  .section-head h2, h2 { font-size: clamp(24px, 7vw, 30px); }
+  .stat-card { padding: 16px; }
+  .stat-num { font-size: 32px; }
+  .tabbar { left: 8px; right: 8px; }
+  .tabbar a { font-size: 10.5px; }
+  .ba-side { padding: 18px; }
+  .phone-wrap { min-height: 440px; }
+  .phone-sec .phone { transform: scale(.85) rotate(4deg); }
+  .lab { padding: 18px; }
+  .cta-band { padding: 28px 22px; }
+  .page-head h1 { font-size: clamp(28px, 8vw, 36px); }
+}
+@media (max-width: 345px) { .topbar .logo span:last-child { display: none; } .topbar .logo { padding: 0 7px; } }
+
+/* ================= Ноутбук и большой монитор: первый экран — «вау» ================= */
+@media (min-width: 901px) {
+  .hero { min-height: calc(100vh - 150px); padding-top: 20px !important; }
+  .devices .laptop { width: min(620px, 100%); }
+}
+@media (min-width: 1440px) {
+  .wrap { max-width: 1360px; }
+  .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 56px; }
+  .hero h1 { font-size: clamp(72px, 5.4vw, 96px); }
+  .hero .lead { font-size: 21px; max-width: 600px; }
+  .devices .laptop { width: min(760px, 100%); }
+  .phone.mini { width: 210px; height: 430px; border-radius: 38px; padding: 10px; }
+  .phone.mini .screen { border-radius: 29px; }
+  .orbit.o1 { width: 620px; height: 620px; }
+  .inside { grid-template-columns: 260px minmax(0, 1fr); }
+  .section-head { max-width: 760px; }
+}
+@media (min-width: 1440px) { .wrap.hero, .wrap.section { padding-left: 0; padding-right: 0; } }
+body::before { background:
+  radial-gradient(1100px 600px at 80% -5%, rgba(46, 197, 240, .16), transparent 60%),
+  radial-gradient(800px 600px at -5% 35%, rgba(246, 195, 67, .08), transparent 60%),
+  radial-gradient(900px 700px at 60% 110%, rgba(46, 197, 240, .07), transparent 60%); }
+
+/* ================= Отступы по краям на любых экранах ================= */
+.wrap.hero, .wrap.section { padding-left: 16px; padding-right: 16px; }
+@media (min-width: 1240px) { .wrap.hero, .wrap.section { padding-left: 0; padding-right: 0; } }
+
 /* ================= Режим embed (внутри макета) ================= */
 body.embed .topbar, body.embed .footer, body.embed .tabbar, body.embed .to-top, body.embed .dots, body.embed .sticky-cta, body.embed .scroll-cue, body.embed .scroll-progress { display: none !important; }
 body.embed main { padding-top: 8px; }
