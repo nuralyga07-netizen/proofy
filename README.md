@@ -76,3 +76,17 @@ Gambit Hackathon 2026 · трек HackHub · кейс «Талант до вуз
 
 - Интерфейс на 5 языках: қазақша, русский, English, Türkçe, 中文 (кнопка с глобусом в шапке, файл `i18n.js`).
 - Задание для бэкенда: [BACKEND.md](BACKEND.md) — таблицы, эндпоинты, формат подписи ECDSA и правила доступа.
+
+## Фотографии
+
+Фото на главной — с [Unsplash](https://unsplash.com/license) (бесплатная лицензия Unsplash, можно использовать на сайте без разрешения автора). Загружаются с images.unsplash.com:
+
+| Где | Фото |
+| --- | --- |
+| «Для кого» — школьникам | [photo-1571260899304](https://unsplash.com/photos/woman-carrying-white-and-green-textbook-iQPr1XkF5F0) |
+| «Для кого» — организаторам | [photo-1563461660947](https://images.unsplash.com/photo-1563461660947-507ef49e9c47) |
+| «Для кого» — вузам | [photo-1627556704290](https://images.unsplash.com/photo-1627556704290-2b1f5853ff78) |
+| Баннер «Наша миссия» | [photo-1522202176988](https://unsplash.com/photos/three-people-sitting-in-front-of-table-laughing-together-g1Kr4Ozfoac) |
+| Финальный призыв | [photo-1639765766830](https://images.unsplash.com/photo-1639765766830-d829d2fe4219) |
+
+Люди на фото — не пользователи Proofy, фото иллюстративные. Отзывов и цифр «из воздуха» на сайте нет.

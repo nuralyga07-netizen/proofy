@@ -35,7 +35,9 @@ const PROFILES = {
   s5: { headline: 'Инженер-конструктор', fame: 'Призёр областного турнира FTC', about: 'Проектирует детали в CAD и печатает их на 3D-принтере.', skills: ['3D-печать', 'CAD', 'Электроника'], projects: [['Протез-манипулятор', 'Прототип кисти руки из 3D-печати']] },
   s6: { headline: 'Любит алгебру', fame: 'Участник областной олимпиады по математике', about: 'Готовится к областной олимпиаде следующего года.', skills: ['Алгебра'], projects: [] },
 };
-const emptyProfile = () => ({ headline: '', fame: '', about: '', skills: [], projects: [] });
+/* Фото: Unsplash (бесплатная лицензия), авторы указаны в README */
+const PHOTO = (id, w = 1200) => `https://images.unsplash.com/photo-${id}?w=${w}&q=72&auto=format&fit=crop`;
+const emptyProfile = () =>({ headline: '', fame: '', about: '', skills: [], projects: [] });
 
 /* ---------------- Иконки ---------------- */
 const svg = (d, extra = '') => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
@@ -381,9 +383,22 @@ function viewHome() {
   <section class="wrap section">
     <div class="grid g4">
       <div class="stat-card reveal"><div class="stat-num sky" data-count="${db.certs.length}">0</div><div class="muted small">${plural(db.certs.length, 'сертификат', 'сертификата', 'сертификатов')} в реестре</div></div>
-      <div class="stat-card reveal"><div class="stat-num gold" data-count="${db.orgs.filter((o) => o.verified).length}">0</div><div class="muted small">подтверждённых организатора</div></div>
+      <div class="stat-card reveal"><div class="stat-num gold"><span data-count="100">0</span>%</div><div class="muted small">изменённых сертификатов ловит подпись</div></div>
       <div class="stat-card reveal"><div class="stat-num ok" data-count="${cities}">0</div><div class="muted small">городов, включая малые</div></div>
-      <div class="stat-card reveal"><div class="stat-num" data-count="5">0</div><div class="muted small">секунд на одну проверку</div></div>
+      <div class="stat-card reveal"><div class="stat-num">≤<span data-count="5">0</span> с</div><div class="muted small">результат проверки</div></div>
+    </div>
+  </section>
+
+  <section class="wrap section" id="who">
+    <div class="section-head reveal"><div class="eyebrow">Для кого</div><h2>Одна платформа — три стороны</h2></div>
+    <div class="who">
+      ${[
+        ['1571260899304-425eee4c7efc', 'Школьникам', 'Твои победы видны вузам', 'Бесплатно навсегда', '#/register', 'Создать профиль'],
+        ['1563461660947-507ef49e9c47', 'Организаторам', 'Сертификаты, которым верят', 'Бесплатно', '#/org', 'Выдать сертификаты'],
+        ['1627556704290-2b1f5853ff78', 'Вузам и агентствам', 'Таланты из регионов без подделок', 'Пилот 30 дней бесплатно', '#/buyer', 'Найти таланты'],
+      ].map(([img, tag, title, note, href, btn]) => `<a class="who-card reveal" href="${href}">
+        <div class="who-img" style="background-image:url('${PHOTO(img, 900)}')"></div>
+        <div class="who-body"><span class="badge sky">${tag}</span><h3>${title}</h3><span class="muted small">${note}</span><span class="who-go">${btn} ${I.arrow}</span></div></a>`).join('')}
     </div>
   </section>
 
@@ -482,8 +497,47 @@ function viewHome() {
     </div>
   </section>
 
-  <section class="wrap section">
-    <div class="cta-band reveal"><h2>Проверьте настоящий и поддельный сертификат прямо сейчас</h2><a class="btn gold lg" href="#/verify">${I.qr}К проверке</a></div>
+  <section class="photo-banner reveal" style="--img:url('${PHOTO('1522202176988-66273c2fd55f', 1800)}')">
+    <div class="wrap pb-in">
+      <div class="eyebrow">Наша миссия</div>
+      <h2>Школьник из Хромтау заслуживает того же шанса, что и школьник из Алматы.</h2>
+      <a class="btn gold lg" href="#/register">${I.user}Присоединиться</a>
+    </div>
+  </section>
+
+  <section class="wrap section" id="pricing">
+    <div class="section-head reveal"><div class="eyebrow">Тарифы</div><h2>Школьникам и организаторам — бесплатно</h2></div>
+    <div class="plans">
+      ${[
+        ['Школьник', '0 ₸', 'навсегда', ['Подтверждённое портфолио', 'Резюме одной ссылкой', 'Контроль согласия'], '#/register', 'Создать профиль', ''],
+        ['Вуз или агентство', '0 ₸', 'пилот 30 дней', ['Поиск по регионам и весу', 'Проверка без ограничений', 'Запросы контактов', 'API для CRM'], '#/buyer', 'Начать пилот', 'hot'],
+        ['Организатор', '0 ₸', 'навсегда', ['Выдача сертификатов с подписью', 'Вес конкурса в рейтинге', 'QR на каждом дипломе'], '#/org', 'Выдать сертификаты', ''],
+      ].map(([t, p, per, feats, href, btn, hot]) => `<div class="plan ${hot} reveal">${hot ? '<span class="plan-tag">Платит после пилота</span>' : ''}
+        <h3>${t}</h3><div class="plan-price">${p.replace(' ₸', '')}<i class="cur">₸</i><span>${per}</span></div>
+        <ul>${feats.map((f) => `<li>${I.check}<span>${f}</span></li>`).join('')}</ul>
+        <a class="btn ${hot ? 'gold' : 'ghost'} lg" href="${href}">${btn}</a></div>`).join('')}
+    </div>
+    <p class="muted small reveal" style="text-align:center;margin-top:14px">Цену подписки для вузов и агентств назовём по итогам пилота.</p>
+  </section>
+
+  <section class="wrap section" id="faq">
+    <div class="section-head reveal"><div class="eyebrow">Вопросы</div><h2>Коротко о главном</h2></div>
+    <div class="faq reveal">
+      ${[
+        ['Почему сертификат нельзя подделать?', 'Каждый сертификат подписан закрытым ключом организатора. Если изменить хоть одно слово, подпись перестанет сходиться.'],
+        ['Кто видит данные школьника?', 'Никто, пока школьник и родитель не дадут согласие. Даже тогда вуз видит класс и город, а имя и контакт — только после одобрения запроса.'],
+        ['Сколько стоит?', 'Школьникам и организаторам бесплатно. Вузы и агентства начинают с бесплатного пилота на 30 дней.'],
+        ['Как попасть в реестр?', 'Достижение добавляет только организатор конкурса. Первые сертификаты выдаём по итогам Gambit Hackathon 2026.'],
+        ['Что такое вес конкурса?', 'Оценка от 0 до 100: уровень, число участников, отбор, проверенность организатора. Платный конкурс без отбора получает низкий вес.'],
+      ].map(([q, a], i) => `<details ${i === 0 ? 'open' : ''}><summary>${q}<i></i></summary><p>${a}</p></details>`).join('')}
+    </div>
+  </section>
+
+  <section class="final-cta reveal" style="--img:url('${PHOTO('1639765766830-d829d2fe4219', 1800)}')">
+    <div class="wrap fc-in">
+      <h2>Проверьте настоящий и поддельный сертификат прямо сейчас</h2>
+      <div class="row" style="justify-content:center"><a class="btn gold lg" href="#/verify">${I.qr}К проверке</a><a class="btn ghost lg" href="#/register">Регистрация</a></div>
+    </div>
   </section></div>`;
 }
 const labIs = (p) => Object.entries(LAB_PRESETS[p]).every(([k, v]) => lab[k] === v);

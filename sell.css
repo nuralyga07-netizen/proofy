@@ -1,0 +1,51 @@
+/* ================= Для кого: фотокарточки ================= */
+.who { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.who-card { display: flex; flex-direction: column; border-radius: 24px; overflow: hidden; background: var(--panel); border: 1px solid var(--line); color: var(--ink); transition: transform .3s, border-color .3s, box-shadow .3s; position: relative; }
+.who-card:hover { transform: translateY(-6px); border-color: var(--sky); box-shadow: 0 30px 60px rgba(0, 0, 0, .45); text-decoration: none; }
+.who-img { height: 240px; background-size: cover; background-position: center; position: relative; transition: transform .6s ease; }
+.who-card:hover .who-img { transform: scale(1.05); }
+.who-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, rgba(7, 10, 18, .85)); }
+.who-body { padding: 20px 22px 24px; display: grid; gap: 8px; justify-items: start; margin-top: -40px; position: relative; z-index: 1; }
+.who-body h3 { font: 700 21px var(--display); margin: 4px 0 0; }
+.who-go { margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; color: var(--sky); font-weight: 700; }
+.who-go svg { width: 18px; height: 18px; transition: transform .2s; }
+.who-card:hover .who-go svg { transform: translateX(4px); }
+@media (max-width: 900px) { .who { grid-template-columns: 1fr; } .who-img { height: 200px; } }
+
+/* ================= Фотобаннер миссии ================= */
+.photo-banner, .final-cta { position: relative; margin-top: 80px; padding: 120px 0; background-image: linear-gradient(90deg, rgba(7, 10, 18, .95) 15%, rgba(7, 10, 18, .55) 60%, rgba(7, 10, 18, .25)), var(--img); background-size: cover; background-position: center; background-attachment: fixed; overflow: hidden; }
+.pb-in h2 { font-size: clamp(30px, 4.4vw, 56px); max-width: 760px; margin: 6px 0 26px; line-height: 1.1; }
+.pb-in, .fc-in { position: relative; }
+@media (max-width: 900px) { .photo-banner, .final-cta { background-attachment: scroll; padding: 80px 0; } .pb-in, .fc-in { padding: 0 16px; } }
+
+/* ================= Тарифы ================= */
+.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
+.plan { position: relative; padding: 30px 26px; border-radius: 24px; background: var(--panel); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; }
+.plan h3 { font: 700 19px var(--display); margin: 0; }
+.plan-price { font: 800 46px var(--display); letter-spacing: -.02em; line-height: 1; }
+.plan-price .cur { font: 700 34px Inter, sans-serif; font-style: normal; color: var(--gold); margin-left: 6px; }
+.plan-price span { display: block; font: 500 14px Inter; color: var(--muted); letter-spacing: 0; margin-top: 8px; }
+.plan ul { list-style: none; padding: 0; margin: 4px 0 8px; display: grid; gap: 10px; flex: 1; }
+.plan li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+.plan li svg { width: 18px; height: 18px; color: var(--ok); flex: none; margin-top: 2px; }
+.plan .btn { width: 100%; }
+.plan.hot { background: linear-gradient(180deg, rgba(246, 195, 67, .12), rgba(255, 255, 255, .02)); border-color: rgba(246, 195, 67, .5); box-shadow: 0 30px 80px rgba(246, 195, 67, .12); transform: translateY(-10px); }
+.plan-tag { position: absolute; top: -13px; left: 26px; padding: 5px 12px; border-radius: 999px; background: linear-gradient(135deg, var(--gold), #FFE08A); color: #1A1200; font: 700 12px Inter; }
+@media (max-width: 900px) { .plans { grid-template-columns: 1fr; } .plan.hot { transform: none; order: -1; } }
+
+/* ================= Вопросы ================= */
+.faq { max-width: 860px; display: grid; gap: 10px; }
+.faq details { border-radius: 18px; background: var(--panel); border: 1px solid var(--line); transition: border-color .2s, background .2s; }
+.faq details[open] { border-color: var(--line-2); background: var(--panel-2); }
+.faq summary { list-style: none; cursor: pointer; padding: 20px 22px; display: flex; justify-content: space-between; align-items: center; gap: 16px; font: 600 17px Inter; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary i { width: 28px; height: 28px; border-radius: 50%; background: var(--sky-soft); position: relative; flex: none; transition: transform .3s; }
+.faq summary i::before, .faq summary i::after { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 2px; margin: -1px 0 0 -6px; background: var(--sky); border-radius: 2px; }
+.faq summary i::after { transform: rotate(90deg); transition: transform .3s; }
+.faq details[open] summary i { transform: rotate(180deg); }
+.faq details[open] summary i::after { transform: rotate(0); }
+.faq p { margin: 0; padding: 0 22px 20px; color: var(--muted); font-size: 15px; max-width: 700px; }
+
+/* ================= Финальный призыв ================= */
+.final-cta { text-align: center; background-image: linear-gradient(180deg, rgba(7, 10, 18, .85), rgba(7, 10, 18, .6) 50%, rgba(7, 10, 18, .95)), var(--img); margin-top: 90px; }
+.fc-in h2 { font-size: clamp(30px, 4.2vw, 54px); max-width: 860px; margin: 0 auto 28px; }
